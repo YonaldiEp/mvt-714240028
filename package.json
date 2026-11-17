@@ -1,0 +1,29 @@
+{
+  "name": "geotiles",
+  "version": "1.0.0",
+  "description": "Penampil data geospasial dengan layanan MVT statis di GitHub Pages",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/tiles.test.mjs",
+    "start": "python scripts/serve.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YonaldiEp/mvt-714240028.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/YonaldiEp/mvt-714240028/issues"
+  },
+  "homepage": "https://github.com/YonaldiEp/mvt-714240028#readme",
+  "devDependencies": {
+    "@mapbox/vector-tile": "^2.0.4",
+    "geojson-vt": "^4.0.2",
+    "maplibre-gl": "6.18.0",
+    "pbf": "^4.0.1",
+    "vt-pbf": "^3.1.3"
+  }
+}
