@@ -1,6 +1,6 @@
 # GeoTiles
 
-Penampil data geospasial dengan layanan **Mapbox Vector Tile (MVT) statis** untuk GitHub Pages. Nama aplikasi tidak terikat pada satu kampus atau rute; data dapat ditambah melalui `datasets.json`.
+Penampil data geospasial dengan layanan **Mapbox Vector Tile (MVT) statis** untuk GitHub Pages. data dapat ditambah melalui `datasets.json`.
 
 Tugas Sistem Informasi Geografis, Semester 5 · Yonaldi Ernanda P (714240028).
 
