@@ -4,7 +4,11 @@ Penampil data geospasial dengan layanan **Mapbox Vector Tile (MVT) statis** untu
 
 Tugas Sistem Informasi Geografis, Semester 5 · Yonaldi Ernanda P (714240028).
 
-Alamat publikasi yang dituju: [GeoTiles di GitHub Pages](https://yonaldiep.github.io/mvt-714240028/). Alamat ini baru aktif setelah kode diunggah dan workflow deployment berhasil.
+**Aplikasi:** [GeoTiles di GitHub Pages](https://yonaldiep.github.io/mvt-714240028/).
+
+**Repositori:** [YonaldiEp/mvt-714240028](https://github.com/YonaldiEp/mvt-714240028).
+
+Deployment melalui GitHub Actions sudah berhasil. Setiap push berikutnya ke `main` membuat ulang tile, menjalankan pengujian, dan memperbarui situs.
 
 ## Hasil tugas
 
