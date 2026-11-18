@@ -3,47 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GeoTiles | Peta data geospasial</title>
-  <meta name="description" content="Jelajahi data geospasial melalui vector tile yang disajikan dari GitHub Pages.">
+  <title>GeoTiles | Penjelajah data geospasial</title>
+  <meta name="description" content="Jelajahi, cari, dan periksa data geospasial melalui vector tile.">
   <link rel="stylesheet" href="vendor/maplibre-gl.css">
   <link rel="stylesheet" href="style.css">
   <script type="module" src="index.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#data-panel">Langsung ke data peta</a>
   <header class="site-header">
-    <div><h1>GeoTiles</h1><p>Peta data geospasial</p></div>
-    <a href="tiles.json">Metadata tile</a>
+    <div class="brand"><h1>GeoTiles</h1><p>Penjelajah data geospasial</p></div>
+    <span id="dataset-total" class="dataset-total">Memuat data…</span>
   </header>
-  <main class="layout">
-    <aside class="panel" aria-label="Pengaturan dan detail peta">
-      <h2>Jelajahi data</h2>
-      <label for="dataset">Area peta</label>
-      <select id="dataset" disabled><option>Memuat daftar data…</option></select>
-      <button id="reset" type="button" disabled>Tampilkan seluruh area</button>
-      <p id="status" role="status">Memuat peta dan vector tile…</p>
-      <section class="detail" aria-labelledby="detail-title">
-        <h2 id="detail-title">Detail fitur</h2>
-        <p id="selection-hint">Pilih objek di peta atau dari daftar untuk melihat informasinya.</p>
-        <dl id="feature-detail"></dl>
-        <label for="feature-list">Daftar fitur</label>
-        <select id="feature-list" disabled><option>Menunggu tile…</option></select>
+  <main class="workspace">
+    <aside id="data-panel" class="panel" aria-label="Data dan detail peta" tabindex="-1">
+      <section class="dataset-section" aria-labelledby="data-title">
+        <h2 id="data-title">Data peta</h2>
+        <label for="dataset">Dataset</label>
+        <select id="dataset" disabled><option>Memuat daftar data…</option></select>
+        <p id="dataset-summary" class="muted">Menyiapkan data sumber</p>
       </section>
-      <section class="tile-info" aria-labelledby="tile-title">
-        <h2 id="tile-title">Tile yang dimuat</h2>
-        <p id="tile-summary">Menunggu data…</p>
-        <label class="check"><input id="tile-grid" type="checkbox"> Tampilkan batas tile</label>
-        <p>Permintaan terakhir</p>
-        <a id="tile-request" hidden></a>
-        <p class="hint">Tile vektor berisi geometri dan atribut. Basemap OpenStreetMap menggunakan tile gambar.</p>
+      <section class="features-section" aria-labelledby="features-title">
+        <div class="section-heading"><h2 id="features-title">Fitur</h2><span id="feature-count" class="count" aria-live="polite">0 dimuat</span></div>
+        <div class="search-field">
+          <label class="sr-only" for="search">Cari nama fitur</label>
+          <input id="search" type="search" placeholder="Cari nama fitur…" autocomplete="off" disabled aria-controls="feature-list">
+          <button id="clear-search" class="clear-search" type="button" hidden>Hapus</button>
+        </div>
+        <p id="list-hint" class="list-hint">Daftar mengikuti fitur yang telah dimuat di peta.</p>
+        <div class="feature-scroll">
+          <ul id="feature-list" class="feature-list" aria-label="Daftar fitur"></ul>
+          <p id="list-empty" class="empty-state" role="status">Memuat fitur dari tile…</p>
+        </div>
       </section>
-      <a id="download" hidden download>Unduh GeoJSON sumber</a>
+      <section class="selection-section" aria-labelledby="detail-title">
+        <div class="section-heading"><h2 id="detail-title">Detail fitur</h2><button id="clear-selection" class="text-button" type="button" hidden aria-label="Batalkan pilihan fitur">Tutup</button></div>
+        <p id="selection-hint" class="muted">Pilih fitur dari daftar atau klik objek di peta untuk melihat detailnya.</p>
+        <div id="selected-content" hidden>
+          <h3 id="selected-name" aria-live="polite"></h3>
+          <dl id="feature-detail" class="feature-detail"></dl>
+          <div class="selection-actions">
+            <button id="focus-feature" type="button">Fokuskan fitur</button>
+            <a id="download" class="button-link secondary" download>Unduh GeoJSON</a>
+          </div>
+        </div>
+      </section>
+      <details class="tile-info">
+        <summary>Informasi tile</summary>
+        <div class="tile-content">
+          <p id="tile-summary">Menunggu metadata…</p>
+          <label class="check"><input id="tile-grid" type="checkbox" disabled> Tampilkan batas tile</label>
+          <p class="tile-label">Tile terakhir dimuat</p>
+          <a id="tile-request" hidden></a>
+          <p class="hint">MVT berisi geometri dan atribut. Basemap OpenStreetMap menggunakan tile gambar.</p>
+          <a href="tiles.json">Lihat metadata tile</a>
+        </div>
+      </details>
+      <a id="dataset-download" class="source-link" hidden download>Unduh sumber dataset</a>
     </aside>
     <section class="map-wrapper" aria-label="Peta interaktif">
       <div id="peta" aria-label="Peta GeoTiles"></div>
-      <p id="map-notice" class="map-notice" hidden role="alert"></p>
+      <div class="map-toolbar">
+        <div class="map-context"><h2 id="map-title">Semua data</h2><p id="map-summary">Menyiapkan peta…</p></div>
+        <button id="reset" class="secondary map-reset" type="button" disabled>Atur ulang area</button>
+      </div>
+      <div id="map-notice" class="map-notice" hidden role="alert"><p id="notice-text"></p><button id="retry" class="secondary" type="button">Muat ulang</button></div>
+      <div class="map-status"><span id="status-dot" class="status-dot" aria-hidden="true"></span><p id="status" role="status">Memuat peta…</p></div>
       <noscript>Aktifkan JavaScript untuk menampilkan peta.</noscript>
     </section>
   </main>
-  <footer>Tugas Sistem Informasi Geografis · Yonaldi Ernanda P (714240028)</footer>
+  <footer><span>GeoTiles <span class="footer-credit">/ Yonaldi Ernanda P (714240028)</span></span><span>Data vektor melalui MVT</span></footer>
 </body>
 </html>

@@ -47,7 +47,7 @@ function tileXY(lon, lat, z) {
 }
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist/vendor', { recursive: true });
-for (const file of ['index.html', 'index.js', 'style.css']) await cp(file, `dist/${file}`);
+for (const file of ['index.html', 'index.js', 'feature-utils.js', 'style.css']) await cp(file, `dist/${file}`);
 for (const dataset of datasets) await cp(dataset.file, `dist/${dataset.file}`);
 for (const file of ['maplibre-gl.mjs', 'maplibre-gl-shared.mjs', 'maplibre-gl-worker.mjs', 'maplibre-gl.css']) {
   await cp(`node_modules/maplibre-gl/dist/${file}`, `dist/vendor/${file}`);

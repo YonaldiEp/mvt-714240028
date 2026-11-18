@@ -18,6 +18,19 @@ Deployment melalui GitHub Actions sudah berhasil. Setiap push berikutnya ke `mai
 - GitHub Actions untuk membuat tile, menjalankan pengujian, dan menerbitkan folder `dist/`.
 - Panduan rekaman video YouTube di bawah. Video perlu direkam dan diunggah oleh pengumpul tugas.
 
+## Menggunakan peta
+
+1. Pilih **Dataset** untuk menampilkan kampus, jalan, atau semua data. Nama area dan jumlah fitur sumber ditampilkan di atas peta.
+2. Ketik nama pada **Cari nama fitur**. Pencarian mengabaikan huruf besar-kecil dan tanda aksen. Daftar hanya mencakup fitur yang telah dimuat dari tile selama sesi.
+3. Pilih baris fitur atau klik objek pada peta. Objek yang dipilih mendapat warna lebih tegas dan atributnya muncul pada **Detail fitur**.
+4. Gunakan **Fokuskan fitur** untuk mendekatkan peta ke fitur pilihan. Tombol **Atur ulang area** mengembalikan tampilan ke cakupan dataset aktif.
+5. **Unduh GeoJSON** mengambil sumber dataset dari fitur pilihan. Saat belum ada pilihan fitur, tautan **Unduh sumber dataset** tersedia untuk dataset tertentu.
+6. Buka **Informasi tile** untuk melihat jumlah tile, menampilkan batas tile, membuka tile terakhir, dan melihat metadata.
+
+Pada desktop, peta mengisi ruang kerja di samping panel data. Pada ponsel, peta berada di atas panel. Pencarian, pilihan fitur, tombol, dan informasi tile dapat dioperasikan melalui keyboard; Escape menghapus pencarian dan tombol Tutup membatalkan pilihan fitur.
+
+Daftar menyimpan fitur yang sudah dimuat agar pilihan tidak hilang saat peta digeser. Fokus fitur menggunakan gabungan batas geometri yang tersedia dari tile; ini bukan pembacaan ulang GeoJSON utuh. Data geometri kecil mungkin baru muncul ketika peta diperbesar.
+
 ## Cara kerjanya
 
 ```text
@@ -148,9 +161,10 @@ Isi deskripsi video dengan identitas mahasiswa, tautan repositori, dan URL GitHu
 .github/workflows/pages.yml  Build, test, dan deploy Pages
 scripts/build.mjs           GeoJSON → MVT dan situs siap publikasi
 scripts/serve.py             Server pratinjau lokal
- tests/tiles.test.mjs        Dekode tile dan periksa seluruh fitur sumber
+ tests/*.test.mjs            Pengujian tile, pencarian, dan batas fitur
  datasets.json              Daftar sumber data
  index.html / index.js      Antarmuka dan logika MapLibre
+ feature-utils.js           Pencarian dan perhitungan batas fitur
  style.css                  Tampilan responsif
  *.geojson                  Data sumber
  dist/                      Hasil build (diabaikan Git)
@@ -158,7 +172,7 @@ scripts/serve.py             Server pratinjau lokal
 
 ## Pengujian
 
-`npm test` memerlukan build terlebih dahulu. Pengujian mendekode seluruh `.pbf`, memeriksa versi MVT dan extent, mencocokkan jumlah file dengan katalog, serta memastikan setiap fitur sumber tersedia pada zoom maksimum dengan nama, dataset, dan jenis geometri yang sesuai.
+`npm test` memerlukan build terlebih dahulu. Pengujian mendekode seluruh `.pbf`, memeriksa versi MVT dan extent, mencocokkan jumlah file dengan katalog, serta memastikan setiap fitur sumber tersedia pada zoom maksimum dengan nama, dataset, dan jenis geometri yang sesuai. Pengujian tambahan memeriksa pencarian lintas dataset, nama berulang, aksen, dan batas geometri untuk fokus fitur.
 
 ## Referensi
 
