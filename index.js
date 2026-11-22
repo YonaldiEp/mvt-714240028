@@ -16,7 +16,7 @@ let vectorError = false;
 
 function setStatus(message, ready = false) {
   byId('status').textContent = message;
-  byId('status-dot').classList.toggle('ready', ready);
+  byId('status').classList.toggle('sr-only', ready);
 }
 function announceError(message) {
   byId('map-notice').hidden = false;
@@ -25,16 +25,14 @@ function announceError(message) {
 function fit(bounds, maxZoom = 18) {
   if (!bounds) return;
   map.fitBounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]], {
-    padding: window.innerWidth < 760 ? { top: 120, bottom: 45, left: 25, right: 45 } : 70,
+    padding: window.innerWidth < 760 ? { top: 64, bottom: 36, left: 28, right: 44 } : 70,
     maxZoom, duration: 0
   });
 }
 function updateContext() {
   const dataset = catalog.datasets.find(item => item.id === currentDataset);
   const count = dataset?.count ?? catalog.datasets.reduce((sum, item) => sum + item.count, 0);
-  byId('map-title').textContent = dataset?.name || 'Semua data';
-  byId('map-summary').textContent = `${count} fitur sumber`;
-  byId('dataset-summary').textContent = `${count} fitur sumber${dataset ? '' : ` dalam ${catalog.datasets.length} dataset`}`;
+  byId('dataset-summary').textContent = `${count} objek sumber`;
   byId('dataset-download').hidden = !dataset || selectedId !== null;
   if (dataset) byId('dataset-download').href = dataset.file;
 }
@@ -43,9 +41,7 @@ function setSelection(id) {
   selectedId = id;
   popup?.remove();
   const record = features.get(String(id));
-  byId('selection-hint').hidden = !!record;
   byId('selected-content').hidden = !record;
-  byId('clear-selection').hidden = !record;
   updateContext();
   if (!record) { renderFeatures(); return; }
   const { feature } = record;
@@ -84,14 +80,15 @@ function renderFeatures() {
     const name = document.createElement('strong'); name.textContent = feature.properties.Nama || 'Tanpa nama';
     const type = document.createElement('span');
     const dataset = catalog.datasets.find(item => item.id === feature.properties.dataset);
-    type.textContent = `${geometryLabel(feature.properties.geometry_type)} · ${dataset.name}`;
+    const geometry = geometryLabel(feature.properties.geometry_type);
+    type.textContent = currentDataset === 'all' ? `${geometry} · ${dataset.name}` : geometry;
     button.append(name, type); button.addEventListener('click', () => setSelection(feature.id));
     item.append(button); list.append(item);
     if (focusedId === String(feature.id)) button.focus({ preventScroll: true });
   }
   const empty = byId('list-empty');
   empty.hidden = matches.length > 0;
-  empty.textContent = query ? `Tidak ada fitur bernama “${query}”. Coba nama lain atau hapus pencarian.` : 'Belum ada fitur yang dimuat. Perbesar peta atau pilih dataset untuk melihat detailnya.';
+  empty.textContent = query ? 'Objek tidak ditemukan. Coba nama lain.' : 'Belum ada objek. Perbesar peta atau pilih dataset.';
 }
 function refreshLoadedFeatures() {
   if (!map.getSource('geodata')) return;
@@ -118,28 +115,34 @@ async function start() {
   if (!response.ok) throw new Error('Daftar data gagal dimuat. Periksa koneksi lalu muat ulang halaman.');
   catalog = await response.json();
   updateContext();
-  byId('dataset-total').textContent = `${catalog.datasets.length} dataset`;
   const tileURL = new URL('tiles/{z}/{x}/{y}.pbf', location.href).href.replaceAll('%7B', '{').replaceAll('%7D', '}');
   map = new maplibregl.Map({ container: 'peta', center: [107.556, -6.88], zoom: 13,
+    locale: {
+      'Map.Title': 'Peta objek geospasial',
+      'NavigationControl.ZoomIn': 'Perbesar peta',
+      'NavigationControl.ZoomOut': 'Perkecil peta',
+      'Popup.Close': 'Tutup info objek',
+      'AttributionControl.ToggleAttribution': 'Tampilkan atau sembunyikan atribusi'
+    },
     minZoom: catalog.minzoom, maxZoom: 20, renderWorldCopies: false,
     style: { version: 8, sources: {
       basemap: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256,
         maxzoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>' },
       geodata: { type: 'vector', tiles: [tileURL], bounds: catalog.bounds, minzoom: catalog.minzoom, maxzoom: catalog.maxzoom }
     }, layers: [
-      { id: 'background', type: 'background', paint: { 'background-color': '#e8eee8' } },
-      { id: 'basemap', type: 'raster', source: 'basemap' },
-      { id: 'areas', type: 'fill', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'Polygon'], paint: { 'fill-color': '#12643e', 'fill-opacity': ['case', selectedPaint, .65, .18] } },
-      { id: 'outlines', type: 'line', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'Polygon'], paint: { 'line-color': ['case', selectedPaint, '#073d24', '#12643e'], 'line-width': ['case', selectedPaint, 3, 1.8] } },
-      { id: 'lines', type: 'line', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'LineString'], paint: { 'line-color': ['case', selectedPaint, '#073d24', '#12643e'], 'line-width': ['case', selectedPaint, 7, 3.5] } },
-      { id: 'points', type: 'circle', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'Point'], paint: { 'circle-color': '#12643e', 'circle-radius': ['case', selectedPaint, 9, 6], 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 } }
+      { id: 'background', type: 'background', paint: { 'background-color': '#242424' } },
+      { id: 'basemap', type: 'raster', source: 'basemap', paint: { 'raster-saturation': -1, 'raster-brightness-min': .86, 'raster-brightness-max': .09 } },
+      { id: 'areas', type: 'fill', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'Polygon'], paint: { 'fill-color': '#ffd174', 'fill-opacity': ['case', selectedPaint, .78, .22] } },
+      { id: 'outlines', type: 'line', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'Polygon'], paint: { 'line-color': ['case', selectedPaint, '#fffaf0', '#ffd174'], 'line-width': ['case', selectedPaint, 3, 1.8] } },
+      { id: 'lines', type: 'line', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'LineString'], paint: { 'line-color': ['case', selectedPaint, '#fffaf0', '#ffd174'], 'line-width': ['case', selectedPaint, 7, 3.5] } },
+      { id: 'points', type: 'circle', source: 'geodata', 'source-layer': 'features', filter: ['==', ['geometry-type'], 'Point'], paint: { 'circle-color': '#ffd174', 'circle-radius': ['case', selectedPaint, 9, 6], 'circle-stroke-color': '#fffaf0', 'circle-stroke-width': 2 } }
     ] }
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
   map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
   map.on('error', event => {
     console.error(event.error);
-    if (event.sourceId === 'basemap') announceError('Basemap gagal dimuat. Data vektor masih dapat dijelajahi. Periksa koneksi untuk memuat basemap.');
+    if (event.sourceId === 'basemap') announceError('Peta dasar gagal dimuat. Objek vektor tetap tersedia.');
     else { vectorError = true; setStatus('Sebagian data belum tersedia'); announceError('Sebagian data peta gagal dimuat. Periksa koneksi lalu muat ulang halaman.'); }
   });
   map.on('sourcedataloading', event => { if (event.sourceId === 'geodata') setStatus('Memuat tile vektor…'); });
@@ -169,7 +172,7 @@ async function start() {
     for (const dataset of catalog.datasets) select.add(new Option(dataset.name, dataset.id));
     select.disabled = false;
     for (const id of ['reset', 'search', 'tile-grid']) byId(id).disabled = false;
-    byId('tile-summary').textContent = `${catalog.tileCount} file MVT pada zoom ${catalog.minzoom}–${catalog.maxzoom}. Zoom lebih dekat menggunakan tile level tertinggi.`;
+    byId('tile-summary').textContent = `${catalog.tileCount} tile · Zoom ${catalog.minzoom}–${catalog.maxzoom}`;
     fit(catalog.bounds);
   });
   byId('dataset').addEventListener('change', event => {
@@ -197,8 +200,7 @@ byId('retry').addEventListener('click', () => location.reload());
 start().catch(error => {
   console.error(error);
   setStatus('Peta tidak dapat dimuat');
-  byId('dataset-total').textContent = 'Data belum tersedia';
-  byId('dataset-summary').textContent = 'Data belum tersedia';
+  byId('dataset-summary').textContent = '';
   byId('dataset').replaceChildren(new Option('Data belum tersedia', ''));
   byId('list-empty').textContent = 'Daftar fitur belum tersedia. Muat ulang halaman untuk mencoba lagi.';
   announceError(error.message);

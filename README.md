@@ -1,6 +1,6 @@
 # GeoTiles
 
-Penampil data geospasial dengan layanan **Mapbox Vector Tile (MVT) statis** untuk GitHub Pages. data dapat ditambah melalui `datasets.json`.
+Penampil data geospasial dengan layanan **Mapbox Vector Tile (MVT) statis** untuk GitHub Pages. Data dapat ditambah melalui `datasets.json`.
 
 Tugas Sistem Informasi Geografis, Semester 5 · Yonaldi Ernanda P (714240028).
 
@@ -18,14 +18,18 @@ Deployment melalui GitHub Actions sudah berhasil. Setiap push berikutnya ke `mai
 - GitHub Actions untuk membuat tile, menjalankan pengujian, dan menerbitkan folder `dist/`.
 - Panduan rekaman video YouTube di bawah. Video perlu direkam dan diunggah oleh pengumpul tugas.
 
-## Menggunakan peta
+## Fitur aplikasi
 
-1. Pilih **Dataset** untuk menampilkan kampus, jalan, atau semua data. Nama area dan jumlah fitur sumber ditampilkan di atas peta.
-2. Ketik nama pada **Cari nama fitur**. Pencarian mengabaikan huruf besar-kecil dan tanda aksen. Daftar hanya mencakup fitur yang telah dimuat dari tile selama sesi.
-3. Pilih baris fitur atau klik objek pada peta. Objek yang dipilih mendapat warna lebih tegas dan atributnya muncul pada **Detail fitur**.
-4. Gunakan **Fokuskan fitur** untuk mendekatkan peta ke fitur pilihan. Tombol **Atur ulang area** mengembalikan tampilan ke cakupan dataset aktif.
-5. **Unduh GeoJSON** mengambil sumber dataset dari fitur pilihan. Saat belum ada pilihan fitur, tautan **Unduh sumber dataset** tersedia untuk dataset tertentu.
-6. Buka **Informasi tile** untuk melihat jumlah tile, menampilkan batas tile, membuka tile terakhir, dan melihat metadata.
+| Fitur | Cara menggunakan |
+|---|---|
+| Filter dataset | Pilih kampus, jalan, atau semua data pada **Dataset**. Angka di sebelah label menunjukkan jumlah objek di sumber. |
+| Pencarian objek | Ketik nama di **Cari nama objek** untuk menyaring objek yang sudah dimuat. Pencarian mengabaikan kapital dan aksen. |
+| Pilihan dan detail | Klik objek di peta atau pilih namanya di daftar untuk melihat geometri dan dataset asal. Garis objek pilihan berubah lebih tebal. |
+| Navigasi peta | Geser atau perbesar peta. **Fokus ke objek** mendekatkan tampilan ke pilihan. **Atur ulang area** kembali ke cakupan dataset. |
+| Unduhan | **Unduh dataset** menyimpan GeoJSON lengkap milik dataset aktif atau dataset asal objek pilihan. |
+| Inspeksi tile | Buka **Informasi tile** untuk melihat jumlah dan rentang zoom, menyalakan batas tile, membuka file PBF terakhir, atau membaca TileJSON. |
+
+Menu **Fitur aplikasi** di kanan atas menyediakan daftar ringkas ini saat menggunakan peta.
 
 Pada desktop, peta mengisi ruang kerja di samping panel data. Pada ponsel, peta berada di atas panel. Pencarian, pilihan fitur, tombol, dan informasi tile dapat dioperasikan melalui keyboard; Escape menghapus pencarian dan tombol Tutup membatalkan pilihan fitur.
 
@@ -105,7 +109,7 @@ https://yonaldiep.github.io/mvt-714240028/tiles.json
 https://yonaldiep.github.io/mvt-714240028/tiles/{z}/{x}/{y}.pbf
 ```
 
-URL terakhir adalah template; ganti `{z}`, `{x}`, `{y}` dengan tile yang benar. Tautan **Permintaan terakhir** di aplikasi menampilkan contoh tile yang benar-benar telah dimuat. `tiles.json` memakai template relatif terhadap direktori situs; klien eksternal perlu mengubahnya menjadi URL absolut sesuai alamat publikasi.
+URL terakhir adalah template. Ganti `{z}`, `{x}`, dan `{y}` dengan koordinat tile. Tautan PBF di **Informasi tile** menampilkan tile terakhir yang dimuat. `tiles.json` memakai template relatif terhadap direktori situs. Klien eksternal perlu mengubahnya menjadi URL absolut sesuai alamat publikasi.
 
 ## Menambah atau mengganti data
 

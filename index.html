@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GeoTiles | Penjelajah data geospasial</title>
-  <meta name="description" content="Jelajahi, cari, dan periksa data geospasial melalui vector tile.">
+  <meta name="theme-color" content="#101010">
+  <title>GeoTiles | Peta interaktif</title>
+  <meta name="description" content="Jelajahi dataset geospasial dan tile vektor di GeoTiles.">
   <link rel="stylesheet" href="vendor/maplibre-gl.css">
   <link rel="stylesheet" href="style.css">
   <script type="module" src="index.js"></script>
@@ -12,66 +13,63 @@
 <body>
   <a class="skip-link" href="#data-panel">Langsung ke data peta</a>
   <header class="site-header">
-    <div class="brand"><h1>GeoTiles</h1><p>Penjelajah data geospasial</p></div>
-    <span id="dataset-total" class="dataset-total">Memuat data…</span>
+    <h1>GeoTiles</h1>
+    <button type="button" class="menu-button" popovertarget="app-features">Fitur aplikasi</button>
+    <section id="app-features" popover aria-labelledby="menu-title">
+      <div class="section-heading"><h2 id="menu-title">Fitur aplikasi</h2><button type="button" class="text-button" popovertarget="app-features" popovertargetaction="hide">Tutup</button></div>
+      <ul>
+        <li>Pilih dataset dan cari objek</li>
+        <li>Periksa geometri dan asal objek</li>
+        <li>Fokus ke objek atau atur ulang area</li>
+        <li>Unduh GeoJSON per dataset</li>
+        <li>Lihat batas, file, dan metadata tile</li>
+      </ul>
+    </section>
   </header>
   <main class="workspace">
-    <aside id="data-panel" class="panel" aria-label="Data dan detail peta" tabindex="-1">
+    <aside id="data-panel" class="panel" aria-label="Data peta" tabindex="-1">
       <section class="dataset-section" aria-labelledby="data-title">
-        <h2 id="data-title">Data peta</h2>
-        <label for="dataset">Dataset</label>
-        <select id="dataset" disabled><option>Memuat daftar data…</option></select>
-        <p id="dataset-summary" class="muted">Menyiapkan data sumber</p>
+        <div class="section-heading"><h2 id="data-title"><label for="dataset">Dataset</label></h2><span id="dataset-summary" class="count"></span></div>
+        <select id="dataset" disabled><option>Memuat dataset…</option></select>
       </section>
       <section class="features-section" aria-labelledby="features-title">
-        <div class="section-heading"><h2 id="features-title">Fitur</h2><span id="feature-count" class="count" aria-live="polite">0 dimuat</span></div>
+        <div class="section-heading"><h2 id="features-title">Objek peta</h2><span id="feature-count" class="count" aria-live="polite"></span></div>
         <div class="search-field">
-          <label class="sr-only" for="search">Cari nama fitur</label>
-          <input id="search" type="search" placeholder="Cari nama fitur…" autocomplete="off" disabled aria-controls="feature-list">
-          <button id="clear-search" class="clear-search" type="button" hidden>Hapus</button>
+          <label class="sr-only" for="search">Cari nama objek</label>
+          <input id="search" type="search" placeholder="Cari nama objek…" autocomplete="off" disabled aria-controls="feature-list">
+          <button id="clear-search" class="clear-search text-button" type="button" hidden>Hapus</button>
         </div>
-        <p id="list-hint" class="list-hint">Daftar mengikuti fitur yang telah dimuat di peta.</p>
         <div class="feature-scroll">
-          <ul id="feature-list" class="feature-list" aria-label="Daftar fitur"></ul>
-          <p id="list-empty" class="empty-state" role="status">Memuat fitur dari tile…</p>
+          <ul id="feature-list" class="feature-list" aria-label="Objek yang dimuat"></ul>
+          <p id="list-empty" class="empty-state" role="status">Memuat objek…</p>
         </div>
       </section>
-      <section class="selection-section" aria-labelledby="detail-title">
-        <div class="section-heading"><h2 id="detail-title">Detail fitur</h2><button id="clear-selection" class="text-button" type="button" hidden aria-label="Batalkan pilihan fitur">Tutup</button></div>
-        <p id="selection-hint" class="muted">Pilih fitur dari daftar atau klik objek di peta untuk melihat detailnya.</p>
-        <div id="selected-content" hidden>
-          <h3 id="selected-name" aria-live="polite"></h3>
-          <dl id="feature-detail" class="feature-detail"></dl>
-          <div class="selection-actions">
-            <button id="focus-feature" type="button">Fokuskan fitur</button>
-            <a id="download" class="button-link secondary" download>Unduh GeoJSON</a>
-          </div>
+      <section id="selected-content" class="selection-section" aria-labelledby="selected-name" hidden>
+        <div class="section-heading"><h2 id="selected-name" aria-live="polite"></h2><button id="clear-selection" class="text-button" type="button" aria-label="Tutup detail objek">Tutup</button></div>
+        <dl id="feature-detail"></dl>
+        <div class="selection-actions">
+          <button id="focus-feature" type="button">Fokus ke objek</button>
+          <a id="download" class="button-link" download>Unduh dataset</a>
         </div>
       </section>
+      <a id="dataset-download" class="source-link" hidden download>Unduh dataset</a>
       <details class="tile-info">
         <summary>Informasi tile</summary>
         <div class="tile-content">
-          <p id="tile-summary">Menunggu metadata…</p>
+          <p id="tile-summary">Memuat metadata…</p>
           <label class="check"><input id="tile-grid" type="checkbox" disabled> Tampilkan batas tile</label>
-          <p class="tile-label">Tile terakhir dimuat</p>
           <a id="tile-request" hidden></a>
-          <p class="hint">MVT berisi geometri dan atribut. Basemap OpenStreetMap menggunakan tile gambar.</p>
-          <a href="tiles.json">Lihat metadata tile</a>
+          <a href="tiles.json">Metadata TileJSON</a>
         </div>
       </details>
-      <a id="dataset-download" class="source-link" hidden download>Unduh sumber dataset</a>
     </aside>
     <section class="map-wrapper" aria-label="Peta interaktif">
       <div id="peta" aria-label="Peta GeoTiles"></div>
-      <div class="map-toolbar">
-        <div class="map-context"><h2 id="map-title">Semua data</h2><p id="map-summary">Menyiapkan peta…</p></div>
-        <button id="reset" class="secondary map-reset" type="button" disabled>Atur ulang area</button>
-      </div>
-      <div id="map-notice" class="map-notice" hidden role="alert"><p id="notice-text"></p><button id="retry" class="secondary" type="button">Muat ulang</button></div>
-      <div class="map-status"><span id="status-dot" class="status-dot" aria-hidden="true"></span><p id="status" role="status">Memuat peta…</p></div>
+      <button id="reset" class="map-reset" type="button" disabled>Atur ulang area</button>
+      <div id="map-notice" class="map-notice" hidden role="alert"><p id="notice-text"></p><button id="retry" type="button">Muat ulang</button></div>
+      <p id="status" class="map-status" role="status">Memuat peta…</p>
       <noscript>Aktifkan JavaScript untuk menampilkan peta.</noscript>
     </section>
   </main>
-  <footer><span>GeoTiles <span class="footer-credit">/ Yonaldi Ernanda P (714240028)</span></span><span>Data vektor melalui MVT</span></footer>
 </body>
 </html>
